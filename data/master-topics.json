@@ -1,0 +1,68 @@
+[
+  {
+    "id": "0f6396f1-e884-490c-9c55-a4be79d4f3e4",
+    "name": "Basics",
+    "createdAt": "2026-05-30T14:46:20.058Z",
+    "topics": [
+      {
+        "id": "73fb014a-c5e8-4c01-9d89-fd684dbc775b",
+        "name": "Positive or Negative number",
+        "solutions": {},
+        "createdAt": "2026-05-30T14:06:16.678Z"
+      },
+      {
+        "id": "a79a15b2-5b01-4e76-85f2-c9bdc843121f",
+        "name": "Even or Odd number",
+        "solutions": {
+          "cpp": "#include <iostream>\nusing namespace std;\nint main() { int n; cin >> n; cout << (n%2==0 ? \"Even\" : \"Odd\"); }"
+        },
+        "createdAt": "2026-05-30T14:06:16.745Z"
+      },
+      {
+        "id": "440ca6a5-73e1-4262-ae67-45537dc086a1",
+        "name": "Sum of First N Natural numbers",
+        "solutions": {},
+        "createdAt": "2026-05-30T14:06:16.745Z"
+      },
+      {
+        "id": "8bcfef36-080a-48a5-8e51-13016cd8488d",
+        "name": "Sum of N natural numbers",
+        "solutions": {},
+        "createdAt": "2026-05-30T14:06:16.745Z"
+      },
+      {
+        "id": "32cc887f-aa87-4510-ba27-8bec6424ef20",
+        "name": "Sum of numbers in a given range",
+        "solutions": {},
+        "createdAt": "2026-05-30T14:06:16.746Z"
+      },
+      {
+        "id": "c521b20e-ac79-49fd-bd9c-96b7d471e4cf",
+        "name": "Greatest of two numbers",
+        "solutions": {},
+        "createdAt": "2026-05-30T14:06:16.746Z"
+      },
+      {
+        "id": "311afe62-36bf-4fb1-b5c8-4ae0a0f94d06",
+        "name": "Greatest of the Three numbers",
+        "solutions": {},
+        "createdAt": "2026-05-30T14:06:16.746Z"
+      }
+    ]
+  },
+  {
+    "id": "38ce914a-72a6-436c-852f-a6a85ec79dbb",
+    "name": "Array",
+    "topics": [
+      {
+        "id": "85618eec-d2b3-42da-ae35-706b3f1eddf7",
+        "name": "Longest Subarray with Given Sum",
+        "solutions": {
+          "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint longestSubarray(vector<int>& arr, int K) {\n    int left = 0;\n    long long sum = 0;\n    int maxLen = 0;\n\n    for (int right = 0; right < arr.size(); right++) {\n        sum += arr[right];\n\n        while (sum > K) {\n            sum -= arr[left];\n            left++;\n        }\n\n        if (sum == K) {\n            maxLen = max(maxLen, right - left + 1);\n        }\n    }\n\n    return maxLen;\n}\n\nint main() {\n    vector<int> arr = {1, 2, 3, 1, 1, 1, 1};\n    int K = 6;\n\n    cout << longestSubarray(arr, K);\n\n    return 0;\n}"
+        },
+        "createdAt": "2026-05-30T15:18:00.244Z"
+      }
+    ],
+    "createdAt": "2026-05-30T14:51:57.732Z"
+  }
+]
