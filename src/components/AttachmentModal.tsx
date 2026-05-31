@@ -76,26 +76,23 @@ export default function AttachmentModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-2 sm:p-3 backdrop-blur-sm"
-      onClick={onClose}
-    >
+    <div className="modal-overlay" onClick={onClose}>
       <div
-        className="flex h-[94vh] w-[98vw] max-w-[1600px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="modal-panel"
         onClick={(event) => event.stopPropagation()}
+        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-5 py-3 sm:px-6">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 sm:text-xl">{topicName}</h3>
-            <p className="text-sm text-slate-500">
-              Notes:{" "}
-              <span className="font-medium text-slate-700">{attachment.originalName}</span>
-            </p>
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-4 py-3 sm:px-6">
+          <div className="min-w-0 flex-1 pr-2">
+            <h3 className="truncate text-base font-semibold text-slate-900 sm:text-xl">
+              {topicName}
+            </h3>
+            <p className="truncate text-sm text-slate-500">{attachment.originalName}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-400 transition active:bg-slate-100 active:text-slate-600"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -105,12 +102,12 @@ export default function AttachmentModal({
         <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-4">
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl bg-slate-900">
             {showText && (
-              <div className="flex shrink-0 items-center justify-end gap-2 px-5 py-3 sm:px-6">
+              <div className="flex shrink-0 items-center justify-end gap-2 px-4 py-3 sm:px-6">
                 <button
                   type="button"
                   onClick={handleCopy}
                   disabled={!textContent}
-                  className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-500 disabled:opacity-60"
+                  className="min-h-[44px] rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition active:bg-emerald-500 disabled:opacity-60"
                 >
                   {copied ? "Copied!" : "Copy"}
                 </button>
@@ -129,7 +126,7 @@ export default function AttachmentModal({
               )}
 
               {showText && !loading && !error && (
-                <pre className="whitespace-pre-wrap px-5 pb-5 font-mono text-sm leading-relaxed text-emerald-100 sm:px-6 sm:pb-6 sm:text-[15px]">
+                <pre className="whitespace-pre-wrap px-4 pb-4 font-mono text-[13px] leading-relaxed text-emerald-100 sm:px-6 sm:pb-6 sm:text-[15px]">
                   {textContent}
                 </pre>
               )}
@@ -138,7 +135,7 @@ export default function AttachmentModal({
                 <iframe
                   src={fileUrl}
                   title={attachment.originalName}
-                  className="h-full min-h-[70vh] w-full border-0 bg-white"
+                  className="h-full min-h-[60dvh] w-full border-0 bg-white sm:min-h-[70vh]"
                 />
               )}
             </div>

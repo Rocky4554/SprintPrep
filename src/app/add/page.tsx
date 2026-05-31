@@ -116,11 +116,11 @@ export default function AddCodeForm() {
   }
 
   return (
-    <div className="study-bg min-h-screen">
+    <div className="study-bg page-shell min-h-screen">
       <Header active="add" />
 
-      <main className="mx-auto max-w-2xl space-y-6 px-4 py-8 sm:px-6">
-        <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+      <main className="mx-auto max-w-2xl space-y-4 px-3 py-5 sm:space-y-6 sm:px-6 sm:py-8">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm backdrop-blur-sm sm:p-8">
           <h2 className="text-xl font-semibold text-slate-900">Add Master Topic</h2>
           <p className="mt-1 text-sm text-slate-500">
             Create categories like Array, Stack, String — then add topics inside each one.
@@ -159,14 +159,14 @@ export default function AddCodeForm() {
             <button
               type="submit"
               disabled={createMasterMutation.isPending}
-              className="rounded-xl bg-slate-800 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:opacity-60"
+              className="min-h-[48px] w-full rounded-xl bg-slate-800 px-6 py-3 text-sm font-semibold text-white transition active:bg-slate-900 disabled:opacity-60 sm:w-auto"
             >
               {createMasterMutation.isPending ? "Adding..." : "Add Master Topic"}
             </button>
           </form>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm backdrop-blur-sm sm:p-8">
           <h2 className="text-xl font-semibold text-slate-900">Add New Code</h2>
           <p className="mt-1 text-sm text-slate-500">
             Pick a master topic, add the problem name, paste code, and/or attach handwritten notes.
@@ -295,18 +295,18 @@ export default function AddCodeForm() {
                 </div>
               )}
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:gap-3">
                 <button
                   type="submit"
                   disabled={createTopicMutation.isPending}
-                  className="flex-1 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="min-h-[48px] flex-1 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition active:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {createTopicMutation.isPending ? "Saving..." : "Save"}
                 </button>
                 <button
                   type="button"
                   onClick={() => router.push("/")}
-                  className="rounded-xl border border-slate-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  className="min-h-[48px] rounded-xl border border-slate-200 px-6 py-3 text-sm font-medium text-slate-600 transition active:bg-slate-50"
                 >
                   Cancel
                 </button>

@@ -126,19 +126,19 @@ export default function MasterTopicProblems({
 
   return (
     <>
-      <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur-sm sm:p-6 md:p-8">
+        <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">{masterTopic.name}</h2>
-            <p className="text-sm text-slate-500">
+            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">{masterTopic.name}</h2>
+            <p className="mt-0.5 text-sm text-slate-500">
               {masterTopic.topics.length}{" "}
-              {masterTopic.topics.length === 1 ? "problem" : "problems"} — click a
-              language to view the solution
+              {masterTopic.topics.length === 1 ? "problem" : "problems"} — tap a language to
+              view
             </p>
           </div>
           <button
             type="button"
-            className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+            className="hidden min-h-[44px] rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 sm:inline-flex"
           >
             ASCII Table
           </button>
@@ -154,13 +154,13 @@ export default function MasterTopicProblems({
           </p>
         ) : (
           <>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 sm:px-4">
+              <label className="flex min-h-[44px] cursor-pointer items-center gap-2.5 text-sm text-slate-700">
                 <input
                   type="checkbox"
                   checked={allSelected}
                   onChange={(event) => handleSelectAll(event.target.checked)}
-                  className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  className="h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                 />
                 Select all
               </label>
@@ -170,17 +170,17 @@ export default function MasterTopicProblems({
                   type="button"
                   onClick={handleDeleteSelected}
                   disabled={isDeleting}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-white px-4 py-1.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition active:bg-red-50 disabled:opacity-60 sm:rounded-full sm:py-1.5"
                 >
                   <Trash2 className="h-4 w-4" />
                   {isDeleting
                     ? "Deleting..."
-                    : `Delete Selected (${selectedIds.size})`}
+                    : `Delete (${selectedIds.size})`}
                 </button>
               )}
             </div>
 
-            <ul className="space-y-4">
+            <ul className="space-y-3 sm:space-y-4">
               {masterTopic.topics.map((topic) => (
                 <TopicRow
                   key={topic.id}

@@ -9,9 +9,9 @@ export default async function TopicPage({
   const { id } = await params;
 
   return (
-    <div className="study-bg min-h-screen">
+    <div className="study-bg page-shell min-h-screen">
       <Header />
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-5xl px-3 py-5 sm:px-6 sm:py-8">
         <MasterTopicProblems masterTopicId={id} />
       </main>
     </div>

@@ -104,15 +104,13 @@ export default function EditProblemModal({
     createMasterMutation.isPending;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
-      onClick={onClose}
-    >
+    <div className="modal-overlay" onClick={onClose}>
       <div
-        className="w-full max-w-md rounded-2xl bg-white shadow-2xl"
+        className="modal-panel modal-panel--sheet"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <div className="mx-auto mb-1 mt-2 h-1 w-10 rounded-full bg-slate-300 sm:hidden" />
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 sm:px-5 sm:py-4">
           <div className="flex items-center gap-2">
             <Pencil className="h-4 w-4 text-emerald-600" />
             <h3 className="font-semibold text-slate-900">Edit Problem</h3>
@@ -120,14 +118,14 @@ export default function EditProblemModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 active:bg-slate-100 active:text-slate-600"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-4 p-5">
+        <form onSubmit={handleSave} className="space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
           <div>
             <label
               htmlFor="edit-name"
@@ -141,7 +139,7 @@ export default function EditProblemModal({
               required
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
             />
           </div>
 
@@ -203,7 +201,7 @@ export default function EditProblemModal({
                 id="edit-master"
                 value={targetMasterTopicId}
                 onChange={(event) => setTargetMasterTopicId(event.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               >
                 {masterTopics.map((master) => (
                   <option key={master.id} value={master.id}>
@@ -218,11 +216,11 @@ export default function EditProblemModal({
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
           )}
 
-          <div className="flex gap-2 pt-1">
+          <div className="flex flex-col gap-2 pt-1 sm:flex-row">
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+              className="min-h-[48px] flex-1 rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white active:bg-emerald-700 disabled:opacity-60"
             >
               {updateMutation.isPending ? "Saving..." : "Save Changes"}
             </button>
@@ -230,7 +228,7 @@ export default function EditProblemModal({
               type="button"
               onClick={handleDelete}
               disabled={isLoading}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+              className="inline-flex min-h-[48px] items-center justify-center gap-1.5 rounded-xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-600 active:bg-red-50 disabled:opacity-60"
             >
               <Trash2 className="h-4 w-4" />
               Delete
