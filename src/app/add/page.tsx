@@ -3,71 +3,54 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import type { Language, MasterTopic } from "@/types";
+import type { Language } from "@/types";
 import { LANGUAGES } from "@/lib/languages";
+import {
+  useCreateMasterTopic,
+  useCreateTopic,
+  useMasterTopics,
+} from "@/hooks/useTopics";
 
 export default function AddCodeForm() {
   const router = useRouter();
+  const { data: masterTopics = [] } = useMasterTopics();
+  const createMasterMutation = useCreateMasterTopic();
+  const createTopicMutation = useCreateTopic();
 
-  const [masterTopics, setMasterTopics] = useState<MasterTopic[]>([]);
   const [masterTopicId, setMasterTopicId] = useState("");
   const [name, setName] = useState("");
   const [language, setLanguage] = useState<Language>("cpp");
   const [code, setCode] = useState("");
   const [notesFile, setNotesFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const [newMasterName, setNewMasterName] = useState("");
-  const [masterLoading, setMasterLoading] = useState(false);
   const [masterError, setMasterError] = useState("");
   const [masterSuccess, setMasterSuccess] = useState("");
 
-  async function loadMasterTopics() {
-    const response = await fetch("/api/master-topics");
-    if (!response.ok) return;
-    const data = (await response.json()) as MasterTopic[];
-    setMasterTopics(data);
-    if (data.length > 0 && !masterTopicId) {
-      setMasterTopicId(data[0].id);
-    }
-  }
-
   useEffect(() => {
-    loadMasterTopics();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (masterTopics.length > 0 && !masterTopicId) {
+      setMasterTopicId(masterTopics[0].id);
+    }
+  }, [masterTopics, masterTopicId]);
 
   async function handleAddMaster(event: React.FormEvent) {
     event.preventDefault();
-    setMasterLoading(true);
     setMasterError("");
     setMasterSuccess("");
 
     try {
-      const response = await fetch("/api/master-topics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newMasterName }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to save");
-
+      const created = await createMasterMutation.mutateAsync({ name: newMasterName });
       setMasterSuccess(`"${newMasterName}" added!`);
-      const createdId = data.id as string;
       setNewMasterName("");
-      await loadMasterTopics();
-      setMasterTopicId(createdId);
+      setMasterTopicId(created.id);
 
       setTimeout(() => {
-        router.push(`/topics/${createdId}`);
+        router.push(`/topics/${created.id}`);
       }, 600);
     } catch (err) {
       setMasterError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setMasterLoading(false);
     }
   }
 
@@ -79,7 +62,6 @@ export default function AddCodeForm() {
       return;
     }
 
-    setLoading(true);
     setError("");
     setSuccess("");
 
@@ -95,13 +77,7 @@ export default function AddCodeForm() {
         formData.append("file", notesFile);
       }
 
-      const response = await fetch("/api/topics", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to save");
+      await createTopicMutation.mutateAsync(formData);
 
       setSuccess("Saved successfully!");
       setName("");
@@ -114,8 +90,6 @@ export default function AddCodeForm() {
       }, 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -184,10 +158,10 @@ export default function AddCodeForm() {
 
             <button
               type="submit"
-              disabled={masterLoading}
+              disabled={createMasterMutation.isPending}
               className="rounded-xl bg-slate-800 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:opacity-60"
             >
-              {masterLoading ? "Adding..." : "Add Master Topic"}
+              {createMasterMutation.isPending ? "Adding..." : "Add Master Topic"}
             </button>
           </form>
         </div>
@@ -324,10 +298,10 @@ export default function AddCodeForm() {
               <div className="flex gap-3 pt-2">
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={createTopicMutation.isPending}
                   className="flex-1 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {loading ? "Saving..." : "Save"}
+                  {createTopicMutation.isPending ? "Saving..." : "Save"}
                 </button>
                 <button
                   type="button"

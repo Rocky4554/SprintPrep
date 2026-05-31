@@ -1,5 +1,6 @@
 "use client";
 
+import { Pencil } from "lucide-react";
 import type { Language, SubTopic } from "@/types";
 import { LANGUAGES } from "@/lib/languages";
 import LanguageButton from "./LanguageButton";
@@ -7,9 +8,14 @@ import LanguageButton from "./LanguageButton";
 interface TopicRowProps {
   topic: SubTopic;
   onLanguageClick: (topic: SubTopic, language: Language) => void;
+  onEditClick: (topic: SubTopic) => void;
 }
 
-export default function TopicRow({ topic, onLanguageClick }: TopicRowProps) {
+export default function TopicRow({
+  topic,
+  onLanguageClick,
+  onEditClick,
+}: TopicRowProps) {
   const attachments = topic.attachments ?? [];
 
   return (
@@ -41,6 +47,16 @@ export default function TopicRow({ topic, onLanguageClick }: TopicRowProps) {
               </div>
             );
           })}
+          <span className="mx-1 text-slate-300 select-none">|</span>
+          <button
+            type="button"
+            onClick={() => onEditClick(topic)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
+            aria-label={`Edit ${topic.name}`}
+            title="Edit problem"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
 

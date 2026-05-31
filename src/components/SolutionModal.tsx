@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { X } from "lucide-react";
 import type { Language } from "@/types";
 import { LANGUAGE_LABELS } from "@/lib/languages";
+import { useUpdateSolution } from "@/hooks/useTopics";
 
 interface SolutionModalProps {
   topicName: string;
@@ -11,7 +13,6 @@ interface SolutionModalProps {
   language: Language;
   code: string;
   onClose: () => void;
-  onSaved: (code: string) => void;
 }
 
 export default function SolutionModal({
@@ -21,45 +22,32 @@ export default function SolutionModal({
   language,
   code,
   onClose,
-  onSaved,
 }: SolutionModalProps) {
+  const updateMutation = useUpdateSolution();
   const [editedCode, setEditedCode] = useState(code);
   const [savedCode, setSavedCode] = useState(code);
   const [copied, setCopied] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
 
   const isDirty = editedCode !== savedCode;
 
   const handleSave = useCallback(async () => {
-    if (!isDirty || saving) return;
+    if (!isDirty || updateMutation.isPending) return;
 
-    setSaving(true);
     setSaveError("");
 
     try {
-      const response = await fetch("/api/topics", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          masterTopicId,
-          topicId,
-          language,
-          code: editedCode,
-        }),
+      await updateMutation.mutateAsync({
+        masterTopicId,
+        topicId,
+        language,
+        code: editedCode,
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to save");
-
       setSavedCode(editedCode);
-      onSaved(editedCode);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : "Failed to save");
-    } finally {
-      setSaving(false);
     }
-  }, [editedCode, isDirty, language, masterTopicId, onSaved, saving, topicId]);
+  }, [editedCode, isDirty, language, masterTopicId, topicId, updateMutation]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -121,7 +109,7 @@ export default function SolutionModal({
             className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
             aria-label="Close"
           >
-            ✕
+            <X className="h-5 w-5" />
           </button>
         </div>
 
@@ -132,10 +120,10 @@ export default function SolutionModal({
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={saving}
+                  disabled={updateMutation.isPending}
                   className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white shadow-md transition hover:bg-blue-500 disabled:opacity-60"
                 >
-                  {saving ? "Saving..." : "Save"}
+                  {updateMutation.isPending ? "Saving..." : "Save"}
                 </button>
               )}
               <button
@@ -155,13 +143,9 @@ export default function SolutionModal({
             />
           </div>
 
-          {saveError && (
-            <p className="mt-2 text-sm text-red-600">{saveError}</p>
-          )}
+          {saveError && <p className="mt-2 text-sm text-red-600">{saveError}</p>}
           {isDirty && (
-            <p className="mt-2 text-xs text-slate-400">
-              Press Ctrl+S to save changes
-            </p>
+            <p className="mt-2 text-xs text-slate-400">Press Ctrl+S to save changes</p>
           )}
         </div>
       </div>

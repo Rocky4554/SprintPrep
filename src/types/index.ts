@@ -48,5 +48,17 @@ export interface UpdateSolutionPayload {
   code: string;
 }
 
+export interface UpdateSubTopicPayload {
+  topicId: string;
+  sourceMasterTopicId: string;
+  targetMasterTopicId: string;
+  name: string;
+}
+
+export interface DeleteSubTopicPayload {
+  masterTopicId: string;
+  topicId: string;
+}
+
 /** @deprecated Use SubTopic */
 export interface Topic extends SubTopic {}

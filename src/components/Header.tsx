@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import type { MasterTopic } from "@/types";
+import { useMasterTopics } from "@/hooks/useTopics";
 
 interface HeaderProps {
   active?: "home" | "add";
@@ -11,7 +11,7 @@ interface HeaderProps {
 
 export default function Header({ active = "home" }: HeaderProps) {
   const pathname = usePathname();
-  const [masterTopics, setMasterTopics] = useState<MasterTopic[]>([]);
+  const { data: masterTopics = [] } = useMasterTopics();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -20,13 +20,6 @@ export default function Header({ active = "home" }: HeaderProps) {
     : null;
 
   const currentTopic = masterTopics.find((m) => m.id === currentTopicId);
-
-  useEffect(() => {
-    fetch("/api/master-topics")
-      .then((res) => res.json())
-      .then((data: MasterTopic[]) => setMasterTopics(data))
-      .catch(() => setMasterTopics([]));
-  }, [pathname]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

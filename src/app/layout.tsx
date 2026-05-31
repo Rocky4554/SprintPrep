@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import QueryProvider from "@/components/QueryProvider";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -24,7 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${dmSans.variable} ${jetbrainsMono.variable} h-full`}>
-      <body className="min-h-full font-sans antialiased text-slate-900">{children}</body>
+      <body className="min-h-full font-sans antialiased text-slate-900">
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }

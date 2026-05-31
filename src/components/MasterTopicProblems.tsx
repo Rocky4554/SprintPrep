@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { Language, MasterTopic, SubTopic } from "@/types";
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
+import type { Language, SubTopic } from "@/types";
+import {
+  useDeleteAllSubTopics,
+  useMasterTopic,
+} from "@/hooks/useTopics";
 import TopicRow from "./TopicRow";
 import SolutionModal from "./SolutionModal";
+import EditProblemModal from "./EditProblemModal";
 
 interface MasterTopicProblemsProps {
   masterTopicId: string;
@@ -12,59 +18,47 @@ interface MasterTopicProblemsProps {
 export default function MasterTopicProblems({
   masterTopicId,
 }: MasterTopicProblemsProps) {
-  const [masterTopic, setMasterTopic] = useState<MasterTopic | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [modal, setModal] = useState<{
+  const { data: masterTopic, isLoading, error } = useMasterTopic(masterTopicId);
+  const deleteAllMutation = useDeleteAllSubTopics();
+
+  const [solutionModal, setSolutionModal] = useState<{
     topicId: string;
     topicName: string;
     language: Language;
     code: string;
   } | null>(null);
 
-  async function loadMasterTopic() {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await fetch(`/api/master-topics/${masterTopicId}`);
-      if (!response.ok) throw new Error("Not found");
-      const data = (await response.json()) as MasterTopic;
-      setMasterTopic(data);
-    } catch {
-      setError("Could not load this topic. It may have been removed.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadMasterTopic();
-  }, [masterTopicId]);
+  const [editTopic, setEditTopic] = useState<SubTopic | null>(null);
 
   function handleLanguageClick(topic: SubTopic, language: Language) {
     const code = topic.solutions[language];
     if (!code) return;
-    setModal({ topicId: topic.id, topicName: topic.name, language, code });
-  }
-
-  function handleSolutionSaved(updatedCode: string) {
-    if (!modal) return;
-
-    setMasterTopic((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        topics: prev.topics.map((topic) =>
-          topic.id === modal.topicId
-            ? { ...topic, solutions: { ...topic.solutions, [modal.language]: updatedCode } }
-            : topic
-        ),
-      };
+    setSolutionModal({
+      topicId: topic.id,
+      topicName: topic.name,
+      language,
+      code,
     });
-    setModal((prev) => (prev ? { ...prev, code: updatedCode } : null));
   }
 
-  if (loading) {
+  async function handleDeleteAll() {
+    if (!masterTopic) return;
+    if (
+      !confirm(
+        `Delete all ${masterTopic.topics.length} problems under "${masterTopic.name}"? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await deleteAllMutation.mutateAsync(masterTopicId);
+    } catch {
+      // error surfaced via mutation state if needed
+    }
+  }
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600" />
@@ -75,7 +69,7 @@ export default function MasterTopicProblems({
   if (error || !masterTopic) {
     return (
       <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-        {error || "Topic not found."}
+        {error?.message || "Topic not found."}
       </div>
     );
   }
@@ -92,12 +86,25 @@ export default function MasterTopicProblems({
               language to view the solution
             </p>
           </div>
-          <button
-            type="button"
-            className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-          >
-            ASCII Table
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {masterTopic.topics.length > 0 && (
+              <button
+                type="button"
+                onClick={handleDeleteAll}
+                disabled={deleteAllMutation.isPending}
+                className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+              >
+                <Trash2 className="h-4 w-4" />
+                {deleteAllMutation.isPending ? "Deleting..." : "Delete All"}
+              </button>
+            )}
+            <button
+              type="button"
+              className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+            >
+              ASCII Table
+            </button>
+          </div>
         </div>
 
         {masterTopic.topics.length === 0 ? (
@@ -115,21 +122,29 @@ export default function MasterTopicProblems({
                 key={topic.id}
                 topic={topic}
                 onLanguageClick={handleLanguageClick}
+                onEditClick={setEditTopic}
               />
             ))}
           </ul>
         )}
       </div>
 
-      {modal && (
+      {solutionModal && (
         <SolutionModal
-          topicName={modal.topicName}
-          topicId={modal.topicId}
+          topicName={solutionModal.topicName}
+          topicId={solutionModal.topicId}
           masterTopicId={masterTopicId}
-          language={modal.language}
-          code={modal.code}
-          onClose={() => setModal(null)}
-          onSaved={handleSolutionSaved}
+          language={solutionModal.language}
+          code={solutionModal.code}
+          onClose={() => setSolutionModal(null)}
+        />
+      )}
+
+      {editTopic && (
+        <EditProblemModal
+          topic={editTopic}
+          masterTopicId={masterTopicId}
+          onClose={() => setEditTopic(null)}
         />
       )}
     </>

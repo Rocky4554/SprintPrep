@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { connectDB } from "@/lib/mongodb";
+import { deleteAttachment } from "@/lib/gridfs";
 import { mapMasterTopic, mapSubTopic } from "@/lib/serializers";
 import { MasterTopicModel, type SubTopicDocument } from "@/models/MasterTopic";
 import mongoose from "mongoose";
@@ -11,6 +12,7 @@ import type {
   MasterTopic,
   SubTopic,
   UpdateSolutionPayload,
+  UpdateSubTopicPayload,
 } from "@/types";
 
 const SEED_SUBTOPICS = [
@@ -202,6 +204,109 @@ export async function updateTopicSolution(
   await master.save();
 
   return mapSubTopic(topic.toObject() as never);
+}
+
+async function deleteSubTopicAttachments(topic: SubTopicDocument): Promise<void> {
+  for (const file of topic.attachments ?? []) {
+    try {
+      await deleteAttachment(file.fileId.toString());
+    } catch {
+      // ignore missing files in gridfs
+    }
+  }
+}
+
+export async function updateSubTopicMeta(
+  payload: UpdateSubTopicPayload
+): Promise<{ subTopic: SubTopic; masterTopicId: string; previousMasterTopicId: string }> {
+  const name = payload.name.trim();
+  if (!name) throw new Error("Problem name is required.");
+
+  await initDB();
+
+  const source = await MasterTopicModel.findById(payload.sourceMasterTopicId);
+  if (!source) throw new Error("Source master topic not found.");
+
+  const topic = source.topics.id(payload.topicId);
+  if (!topic) throw new Error("Problem not found.");
+
+  const previousMasterTopicId = payload.sourceMasterTopicId;
+
+  if (payload.sourceMasterTopicId === payload.targetMasterTopicId) {
+    const duplicate = source.topics.find(
+      (item: SubTopicDocument) =>
+        item._id.toString() !== payload.topicId &&
+        item.name.toLowerCase() === name.toLowerCase()
+    );
+    if (duplicate) throw new Error("A problem with this name already exists in this topic.");
+
+    topic.name = name;
+    await source.save();
+    return {
+      subTopic: mapSubTopic(topic.toObject() as never),
+      masterTopicId: payload.targetMasterTopicId,
+      previousMasterTopicId,
+    };
+  }
+
+  const target = await MasterTopicModel.findById(payload.targetMasterTopicId);
+  if (!target) throw new Error("Target master topic not found.");
+
+  const duplicate = target.topics.find(
+    (item: SubTopicDocument) => item.name.toLowerCase() === name.toLowerCase()
+  );
+  if (duplicate) throw new Error("A problem with this name already exists in the target topic.");
+
+  const topicObject = topic.toObject();
+  source.topics.pull(payload.topicId);
+  await source.save();
+
+  target.topics.push({
+    ...topicObject,
+    name,
+    _id: topic._id,
+  } as never);
+  await target.save();
+
+  const moved = target.topics.id(payload.topicId);
+  if (!moved) throw new Error("Failed to move problem.");
+
+  return {
+    subTopic: mapSubTopic(moved.toObject() as never),
+    masterTopicId: payload.targetMasterTopicId,
+    previousMasterTopicId,
+  };
+}
+
+export async function deleteSubTopic(
+  masterTopicId: string,
+  topicId: string
+): Promise<void> {
+  await initDB();
+
+  const master = await MasterTopicModel.findById(masterTopicId);
+  if (!master) throw new Error("Master topic not found.");
+
+  const topic = master.topics.id(topicId);
+  if (!topic) throw new Error("Problem not found.");
+
+  await deleteSubTopicAttachments(topic);
+  master.topics.pull(topicId);
+  await master.save();
+}
+
+export async function deleteAllSubTopics(masterTopicId: string): Promise<void> {
+  await initDB();
+
+  const master = await MasterTopicModel.findById(masterTopicId);
+  if (!master) throw new Error("Master topic not found.");
+
+  for (const topic of master.topics) {
+    await deleteSubTopicAttachments(topic);
+  }
+
+  master.topics = [];
+  await master.save();
 }
 
 function escapeRegex(value: string): string {
