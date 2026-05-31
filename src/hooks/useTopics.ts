@@ -8,7 +8,7 @@ import {
 import {
   createMasterTopic,
   createTopic,
-  deleteAllSubTopics,
+  deleteSelectedSubTopics,
   deleteSubTopic,
   fetchMasterTopic,
   fetchMasterTopics,
@@ -117,14 +117,20 @@ export function useDeleteSubTopic() {
   });
 }
 
-export function useDeleteAllSubTopics() {
+export function useDeleteSelectedSubTopics() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (masterTopicId: string) => deleteAllSubTopics(masterTopicId),
-    onSuccess: (_data, masterTopicId) => {
+    mutationFn: ({
+      masterTopicId,
+      topicIds,
+    }: {
+      masterTopicId: string;
+      topicIds: string[];
+    }) => deleteSelectedSubTopics(masterTopicId, topicIds),
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.masterTopics });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masterTopic(masterTopicId),
+        queryKey: queryKeys.masterTopic(variables.masterTopicId),
       });
     },
   });

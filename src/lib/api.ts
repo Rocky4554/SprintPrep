@@ -82,9 +82,14 @@ export async function deleteSubTopic(
   if (!res.ok) throw new Error(await parseError(res));
 }
 
-export async function deleteAllSubTopics(masterTopicId: string): Promise<void> {
+export async function deleteSelectedSubTopics(
+  masterTopicId: string,
+  topicIds: string[]
+): Promise<void> {
   const res = await fetch(`/api/master-topics/${masterTopicId}/topics`, {
     method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topicIds }),
   });
   if (!res.ok) throw new Error(await parseError(res));
 }

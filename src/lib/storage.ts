@@ -295,17 +295,26 @@ export async function deleteSubTopic(
   await master.save();
 }
 
-export async function deleteAllSubTopics(masterTopicId: string): Promise<void> {
+export async function deleteSubTopics(
+  masterTopicId: string,
+  topicIds: string[]
+): Promise<void> {
+  if (topicIds.length === 0) {
+    throw new Error("Select at least one problem to delete.");
+  }
+
   await initDB();
 
   const master = await MasterTopicModel.findById(masterTopicId);
   if (!master) throw new Error("Master topic not found.");
 
-  for (const topic of master.topics) {
+  for (const topicId of topicIds) {
+    const topic = master.topics.id(topicId);
+    if (!topic) continue;
     await deleteSubTopicAttachments(topic);
+    master.topics.pull(topicId);
   }
 
-  master.topics = [];
   await master.save();
 }
 
