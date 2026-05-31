@@ -139,7 +139,7 @@ export default function SolutionModal({
               value={editedCode}
               onChange={(event) => setEditedCode(event.target.value)}
               spellCheck={false}
-              className="min-h-0 w-full flex-1 resize-none border-0 bg-transparent px-5 pb-5 font-mono text-sm leading-snug text-emerald-100 outline-none sm:px-6 sm:pb-6 sm:text-[15px] sm:leading-relaxed"
+              className="no-scrollbar min-h-0 w-full flex-1 resize-none overflow-auto border-0 bg-transparent px-5 pb-5 font-mono text-sm leading-snug text-emerald-100 outline-none sm:px-6 sm:pb-6 sm:text-[15px] sm:leading-relaxed"
             />
           </div>
 

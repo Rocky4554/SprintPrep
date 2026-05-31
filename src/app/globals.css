@@ -33,3 +33,12 @@ pre {
 code {
   font-family: var(--font-mono);
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Pencil, Trash2 } from "lucide-react";
-import type { Language, SubTopic } from "@/types";
+import type { Attachment, Language, SubTopic } from "@/types";
 import { LANGUAGES } from "@/lib/languages";
 import LanguageButton from "./LanguageButton";
 
@@ -12,6 +12,7 @@ interface TopicRowProps {
   onLanguageClick: (topic: SubTopic, language: Language) => void;
   onEditClick: (topic: SubTopic) => void;
   onDeleteClick: (topic: SubTopic) => void;
+  onAttachmentClick: (topic: SubTopic, attachment: Attachment) => void;
 }
 
 export default function TopicRow({
@@ -21,6 +22,7 @@ export default function TopicRow({
   onLanguageClick,
   onEditClick,
   onDeleteClick,
+  onAttachmentClick,
 }: TopicRowProps) {
   const attachments = topic.attachments ?? [];
 
@@ -88,15 +90,14 @@ export default function TopicRow({
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 pl-7 sm:pl-7">
           {attachments.map((file) => (
-            <a
+            <button
               key={file.id}
-              href={`/api/attachments/${file.fileId}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              type="button"
+              onClick={() => onAttachmentClick(topic, file)}
               className="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 transition hover:bg-violet-200"
             >
               📄 {file.originalName}
-            </a>
+            </button>
           ))}
         </div>
       )}

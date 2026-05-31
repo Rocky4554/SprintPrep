@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import type { Language, SubTopic } from "@/types";
+import type { Attachment, Language, SubTopic } from "@/types";
 import {
   useDeleteSelectedSubTopics,
   useDeleteSubTopic,
@@ -11,6 +11,7 @@ import {
 import TopicRow from "./TopicRow";
 import SolutionModal from "./SolutionModal";
 import EditProblemModal from "./EditProblemModal";
+import AttachmentModal from "./AttachmentModal";
 
 interface MasterTopicProblemsProps {
   masterTopicId: string;
@@ -31,6 +32,10 @@ export default function MasterTopicProblems({
     code: string;
   } | null>(null);
   const [editTopic, setEditTopic] = useState<SubTopic | null>(null);
+  const [attachmentModal, setAttachmentModal] = useState<{
+    topicName: string;
+    attachment: Attachment;
+  } | null>(null);
 
   function handleLanguageClick(topic: SubTopic, language: Language) {
     const code = topic.solutions[language];
@@ -185,6 +190,9 @@ export default function MasterTopicProblems({
                   onLanguageClick={handleLanguageClick}
                   onEditClick={setEditTopic}
                   onDeleteClick={handleDeleteOne}
+                  onAttachmentClick={(topic, attachment) =>
+                    setAttachmentModal({ topicName: topic.name, attachment })
+                  }
                 />
               ))}
             </ul>
@@ -208,6 +216,14 @@ export default function MasterTopicProblems({
           topic={editTopic}
           masterTopicId={masterTopicId}
           onClose={() => setEditTopic(null)}
+        />
+      )}
+
+      {attachmentModal && (
+        <AttachmentModal
+          topicName={attachmentModal.topicName}
+          attachment={attachmentModal.attachment}
+          onClose={() => setAttachmentModal(null)}
         />
       )}
     </>
